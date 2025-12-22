@@ -2,7 +2,9 @@
 
 ## Overview
 The Tic-Tac-Toe AOP System is a modular Java command-line backend application that implements a complete two-player Tic-Tac-Toe game with robust input handling, deterministic game rules, and clean separation of concerns.
+
 The project emphasizes backend engineering principles such as domain modeling, testable business logic, build tooling, and the use of Aspect-Oriented Programming (AOP) to modularize cross-cutting concerns. Rather than embedding validation and rule enforcement directly into the game loop, these responsibilities are cleanly separated using AspectJ.
+
 This project is designed as a backend-focused case study, not a UI exercise.
 
 ---
