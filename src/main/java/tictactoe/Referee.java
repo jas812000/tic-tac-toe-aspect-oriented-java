@@ -10,7 +10,6 @@ package tictactoe;
  *
  * This class is invoked automatically after each move via {@code RefereeAspect},
  * and is responsible for detecting:
- * - Wins: horizontal, vertical, or diagonal
  * - Draws: full board with no winner
  *
  * If a game-ending condition is met, it prints the result and prompts the user to restart.
@@ -33,41 +32,17 @@ public class Referee {
 	 * @param board the current game board
 	 */
     public void checkGameOver(Board board) {
-        char[][] g = board.getGrid();  // Retrieve the current board state
+        char[][] g = board.getGrid();
 
-        // Check each row and column for a winning line
-        for (int i = 0; i < 3; i++) {
-            if (g[i][0] != ' ' && g[i][0] == g[i][1] && g[i][1] == g[i][2]) {
-                announceWinner(g[i][0]);  // Horizontal win
-            }
-            if (g[0][i] != ' ' && g[0][i] == g[1][i] && g[1][i] == g[2][i]) {
-                announceWinner(g[0][i]);  // Vertical win
-            }
+        var winner = GameRules.winner(g);
+        if (winner.isPresent()) {
+            announceWinner(winner.get());
+            return;
         }
 
-        // Check diagonals for a win
-        if (g[0][0] != ' ' && g[0][0] == g[1][1] && g[1][1] == g[2][2]) {
-            announceWinner(g[0][0]);  // Diagonal from top-left
-        }
-        if (g[0][2] != ' ' && g[0][2] == g[1][1] && g[1][1] == g[2][0]) {
-            announceWinner(g[0][2]);  // Diagonal from top-right
-        }
-
-        // Check for a full board (draw)
-        boolean full = true;
-        for (char[] row : g) {
-            for (char c : row) {
-                if (c == ' ') {
-                    full = false;
-                    break;
-                }
-            }
-            if (!full) break;
-        }
-
-        if (full) {
+        if (GameRules.isDraw(g)) {
             System.out.println("\nGame is a draw!");
-            restartGame.promptRestart();  	// Offer to restart the game
+            restartGame.promptRestart();
         }
     }
 
