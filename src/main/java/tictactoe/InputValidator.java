@@ -5,91 +5,65 @@ import java.util.Scanner;
 /**
  * Provides validation for player move input in the TicTacToe game.
  *
- * Responsibilities include:
- * - Prompting the current player for move coordinates
- * - Validating numeric input and board boundaries
- * - Ensuring the selected cell is not already occupied
- *
- * Called by {@code InputAspect} to keep validation logic modular and reusable.
- *
- * @author James Stevens
- * @version 1.0
- * @since 2025-07-01
+ * - Prompts for row then column (1–3)
+ * - Validates numeric input and board boundaries
+ * - Ensures the selected cell is not already occupied
+ * - Supports typing 'exit' (case-insensitive) to quit at any prompt
  */
 public class InputValidator {
 
-	/**
-	 * Prompts the current player for input until a valid move is entered.
-	 *
-	 * This method handles:
-	 * - Numeric input validation
-	 * - Bounds checking (1–3, converted to 0-based)
-	 * - Cell occupancy checks
-	 *
-	 * @param board the current game board
-	 * @return an integer array containing the valid row and column (0-based)
-	 */
+    /**
+     * Prompts the current player for input until a valid move is entered.
+     *
+     * @param board the current game board
+     * @return an integer array containing the valid row and column (0-based)
+     */
     public static int[] getValidMove(Board board) {
-
-        // Use the shared scanner from InputHandler
         Scanner scanner = InputHandler.scanner;
 
-        int row = -1, col = -1;
-
         while (true) {
-            try {
-                // Display the current player's name and symbol
-                System.out.println("\n" + TicTacToe.currentPlayer.getName()
+            System.out.println("\n" + TicTacToe.currentPlayer.getName()
                     + " (Player '" + TicTacToe.currentPlayer.getSymbol() + "')");
 
-                // Prompt the user for row and column input (1–3)
-                System.out.println("Enter row and column (1-3) separated by a space (e.g., 2 3) or type 'exit':");
-                System.out.print("> ");
-                String line = scanner.nextLine().trim();
-
-                if (line.equalsIgnoreCase("exit")) {
-                    System.out.println("\nExiting TicTacToe. Goodbye!");
-                    System.exit(0);
-                }
-
-                String[] parts = line.split("\\s+");
-                if (parts.length != 2) {
-                    System.out.println("Invalid input. Please enter two numbers like: 2 3");
-                    continue;
-                }
-
-                try {
-                    row = Integer.parseInt(parts[0]);
-                    col = Integer.parseInt(parts[1]);
-                } catch (NumberFormatException e) {
-                    System.out.println("Invalid input. Please enter numeric values only.");
-                    continue;
-                }
-// Convert from 1-based to 0-based indexing
-                row--;
-                col--;
-
-                // Validate row and column bounds
-                if (row < 0 || row > 2 || col < 0 || col > 2) {
-                    System.out.println("Invalid entry. Row and column must be between 1 and 3.");
-                    continue;
-                }
-
-                // Check if the chosen cell is already occupied
-                if (board.getGrid()[row][col] != ' ') {
-                    System.out.println("Invalid move. Cell already taken. Try again.");
-                    continue;
-                }
-
-                // Valid move found
-                return new int[] { row, col };
-
-            } catch (Exception e) {
-                // Handle non-numeric input and clear invalid input from buffer
-                System.out.println("Invalid input. Please enter numeric values only.");
-                scanner.nextLine(); // Clear buffer
+            // Read row
+            System.out.print("Row (1-3) or type 'exit': ");
+            String rowInput = scanner.nextLine().trim();
+            if (rowInput.equalsIgnoreCase("exit")) {
+                System.out.println("\nExiting TicTacToe. Goodbye!");
+                System.exit(0);
             }
+
+            // Read column
+            System.out.print("Column (1-3) or type 'exit': ");
+            String colInput = scanner.nextLine().trim();
+            if (colInput.equalsIgnoreCase("exit")) {
+                System.out.println("\nExiting TicTacToe. Goodbye!");
+                System.exit(0);
+            }
+
+            int row;
+            int col;
+            try {
+                row = Integer.parseInt(rowInput) - 1;
+                col = Integer.parseInt(colInput) - 1;
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter numeric values only.");
+                continue;
+            }
+
+            // Bounds check
+            if (row < 0 || row > 2 || col < 0 || col > 2) {
+                System.out.println("Invalid entry. Row and column must be between 1 and 3.");
+                continue;
+            }
+
+            // Occupancy check
+            if (board.getGrid()[row][col] != ' ') {
+                System.out.println("Invalid move. Cell already taken. Try again.");
+                continue;
+            }
+
+            return new int[] { row, col };
         }
     }
 }
-
