@@ -2,16 +2,6 @@ package tictactoe;
 
 import java.util.Scanner;
 
-/*
- * Author: James Stevens
- * Date: 01 July 2025
- * Course: SWEN 656 - Advanced Software Design and Implementation
- * 
- * Copyright (c) 2025 James Stevens
- * This file is part of the TicTacToe project and may not be used, copied,
- * modified, or distributed without permission.
- */
-
 /**
  * Handles input requests from the current player.
  *
@@ -43,8 +33,8 @@ public class InputHandler {
      */
     public static int[] getPlayerMove(Board board) {
         // This method will be intercepted by the InputAspect at runtime
-        return new int[] { -1, -1 }; // Default placeholder; never actually used
-    } 
+        throw new IllegalStateException("InputHandler.getPlayerMove must be intercepted by InputAspect");
+    }
 }
 
 
