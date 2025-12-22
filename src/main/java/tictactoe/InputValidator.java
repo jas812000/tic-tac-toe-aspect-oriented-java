@@ -53,13 +53,29 @@ public class InputValidator {
                     + " (Player '" + TicTacToe.currentPlayer.getSymbol() + "')");
 
                 // Prompt the user for row and column input (1–3)
-                System.out.println("Enter row and column (1–3). Press 'enter' after each:");
-                System.out.print("Row: ");
-                row = scanner.nextInt();
-                System.out.print("Column: ");
-                col = scanner.nextInt();
+                System.out.println("Enter row and column (1-3) separated by a space (e.g., 2 3) or type 'exit':");
+                System.out.print("> ");
+                String line = scanner.nextLine().trim();
 
-                // Convert from 1-based to 0-based indexing
+                if (line.equalsIgnoreCase("exit")) {
+                    System.out.println("\nExiting TicTacToe. Goodbye!");
+                    System.exit(0);
+                }
+
+                String[] parts = line.split("\\s+");
+                if (parts.length != 2) {
+                    System.out.println("Invalid input. Please enter two numbers like: 2 3");
+                    continue;
+                }
+
+                try {
+                    row = Integer.parseInt(parts[0]);
+                    col = Integer.parseInt(parts[1]);
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid input. Please enter numeric values only.");
+                    continue;
+                }
+// Convert from 1-based to 0-based indexing
                 row--;
                 col--;
 
