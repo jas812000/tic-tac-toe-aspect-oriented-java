@@ -1,83 +1,178 @@
-# Modular Tic Tac Toe Engine with Aspect-Oriented Architecture
+# Tic-Tac-Toe AOP System
 
 ## Overview
-This project implements a two-player Tic Tac Toe game in Java with a strong emphasis on modular backend design and separation of concerns. Aspect-Oriented Programming (AOP) is used to isolate cross-cutting behavior—such as turn sequencing, input handling, and referee evaluation—from the core game logic.
-
-The result is a maintainable, extensible console-based game engine where each component has a clear and focused responsibility.
-
----
-
-## Key Objectives
-- Design a clean and maintainable backend architecture
-- Apply Aspect-Oriented Programming to manage cross-cutting concerns
-- Enforce reliable input validation and error handling
-- Maintain clear separation between game state, rules, and execution flow
-
----
-
-## System Architecture
-
-### Core Classes
-- **Board** — Maintains the game grid and move availability
-- **Player** — Represents player identity and symbol
-- **Referee** — Evaluates win and draw conditions
-- **InputHandler** — Coordinates user input
-- **InputValidator** — Validates move correctness
-- **RestartGame** — Handles replay logic
-- **TicTacToe / Main** — Orchestrates overall game execution
-
-### Aspect-Oriented Components
-- **TurnAspect** — Manages player turn sequencing
-- **InputAspect** — Injects input acquisition and validation logic
-- **RefereeAspect** — Triggers game-state evaluation after each move
-- **AspectOrder** — Controls aspect execution order
-
-Aspects remove duplicated logic from the core classes, improving readability and maintainability.
+The Tic-Tac-Toe AOP System is a modular Java command-line backend application that implements a complete two-player Tic-Tac-Toe game with robust input handling, deterministic game rules, and clean separation of concerns.
+The project emphasizes backend engineering principles such as domain modeling, testable business logic, build tooling, and the use of Aspect-Oriented Programming (AOP) to modularize cross-cutting concerns. Rather than embedding validation and rule enforcement directly into the game loop, these responsibilities are cleanly separated using AspectJ.
+This project is designed as a backend-focused case study, not a UI exercise.
 
 ---
 
 ## Features
-- Console-based two-player gameplay
-- Validated user input with re-prompting
-- Automatic win and draw detection
-- Clean turn-based execution flow
-- Restartable game sessions
+- Two-player Tic-Tac-Toe game with a 3×3 board
+- Deterministic win and draw detection
+- Centralized, testable rules engine
+- Aspect-Oriented Programming for input interception and rule enforcement
+- Graceful exit support at all user input points
+- Clean restart flow without nested game loops
+- Optional reuse of player names between games
+- Maven-based build with AspectJ weaving
+- Automated unit tests for core game rules
+- Runnable command-line application
 
 ---
 
-## Technologies Used
-- Java
-- AspectJ
-- Eclipse IDE
-- Console I/O
+## Architecture Overview
+The system follows a layered, object-oriented architecture with AspectJ-based cross-cutting concerns.
+
+### Controller / Application Layer
+#### TicTacToe
+- Orchestrates game setup, player flow, and the main game loop
+- Handles player name input and restart behavior
+- Delegates move input and rule evaluation to specialized components
+
+### Domain Model  
+
+#### Board
+- Represents the 3×3 game grid
+- Encapsulates board state and rendering logic
+
+#### Player
+Represents a player with a name and assigned symbol (`X` or `O`)
+
+### Game Rules Engine
+#### GameRules
+- Pure, stateless rules engine
+- Determines:
+- - Win conditions
+- - Draw conditions
+- Completely decoupled from I/O and UI logic
+- Fully unit-tested
+This separation allows game rules to be tested independently of user interaction or AOP behavior.
+ 
+### Validation & Cross-Cutting Concerns (AOP)
+AspectJ is used to modularize cross-cutting concerns without polluting core game logic.
+#### InputAspect
+- Intercepts calls to InputHandler.getPlayerMove
+- Redirects input handling to centralized validation logic
+#### RefereeAspect
+- Triggers rule evaluation after each move
+- Delegates win/draw detection to GameRules
+This design enforces correctness consistently while keeping the core game loop simple and readable.
+ 
+### Restart & Session Management
+#### RestartGame
+- Handles end-of-game prompts
+- Ensures clean restarts without recursive or nested loops
+#### PlayerSession
+- Stores last-used player names
+- Allows optional reuse of players on restart
+- Keeps session state explicit and controlled
 
 ---
 
-## Design Focus
-This project emphasizes:
-- Backend system structure
-- Separation of concerns
-- Maintainable object-oriented design
-- Practical use of Aspect-Oriented Programming
-
-It intentionally excludes graphical interfaces, networking, and persistence layers to maintain focus on architecture and logic.
+## Repository Structure  
+The project follows the standard Maven directory layout:
+```bash
+tic-tac-toe-aspect-oriented-java/
+├── pom.xml
+├── README.md
+├── LICENSE
+└── src/
+    ├── main/
+    │   ├── java/
+    │   │   └── tictactoe/
+    │   │       ├── Board.java
+    │   │       ├── GameRules.java
+    │   │       ├── InputHandler.java
+    │   │       ├── InputValidator.java
+    │   │       ├── Player.java
+    │   │       ├── PlayerSession.java
+    │   │       ├── Referee.java
+    │   │       ├── RestartGame.java
+    │   │       └── TicTacToe.java
+    │   └── aspectj/
+    │       └── game_aspects/
+    │           ├── AspectOrder.aj
+    │           ├── InputAspect.aj
+    │           ├── RefereeAspect.aj
+    │           └── TurnAspect.aj
+    └── test/
+        └── java/
+            └── tictactoe/
+                └── GameRulesTest.java
+```
+#### Notes:
+- Production code lives under src/main/java
+- AspectJ aspects live under src/main/aspectj
+- Tests live under src/test/java and run with mvn test
 
 ---
 
-## Repository Contents
-- Java source files for core game logic
-- AspectJ files defining cross-cutting behavior
-- Supporting documentation and instructions
+## Error Handling Strategy
+The system enforces correctness and resilience through:
+
+- Defensive validation of all user input
+- Graceful handling of invalid moves
+- Explicit exit support during:
+- - player name entry
+- - row input
+- - column input
+- Fail-fast behavior if AspectJ weaving is not active
+- Clean termination paths without orphaned input loops
+
+Invalid input never crashes the application and is always handled safely.
+
+---
+
+## Build & Run
+The project is a static site and does not require a backend or build step.
+
+### Prerequisites
+- Java 17+  
+- Maven 3.8+
+
+### Build  
+```bash
+mvn clean package  
+```
+
+### Run 
+```bash
+mvn exec:java  
+```
+
+The application runs entirely in the terminal and guides the user through:
+- Player setup
+- Turn-based move entry
+- Win/draw detection
+- Restart or exit flow 
+
+---
+
+## Tools & Technologies  
+- **Language**: Java 17  
+- **Build Tool**: Maven  
+- **Aspect-Oriented Programming**: AspectJ  
+- **Testing**: JUnit 5  
+- **Architecture Style**: Layered backend architecture  
+- **Execution Model**: Command-line application
+
+---
+
+## Purpose  
+This project serves as a backend engineering case study demonstrating:
+- Separation of concerns using Aspect-Oriented Programming
+- Clean domain modeling and testable business logic
+- Deterministic rule evaluation independent of UI flow
+- Defensive input handling
+- Proper build tooling and dependency management
+- Incremental refactoring and architectural improvement
 
 ---
 
 ## License
-© 2025 James Stevens. All rights reserved.
-
-This source code is provided for educational, evaluation, and portfolio review purposes.
-Permission is granted to clone and run the code locally for non-commercial review.
-
-No permission is granted to copy, modify, redistribute, or use this code in
-commercial or production systems without explicit written consent from the author.
+This project is licensed under the MIT License.
+See the [LICENSE](LICENSE) file for details.
 
 ---
+
