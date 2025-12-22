@@ -19,3 +19,11 @@ out/
 *.swp
 *~
 *.save
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# AspectJ / manual build output
+out/
