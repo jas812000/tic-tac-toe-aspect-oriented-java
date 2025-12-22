@@ -3,16 +3,6 @@ package game_aspects;
 import tictactoe.Board;
 import tictactoe.InputValidator;
 
-/*
- * Author: James Stevens
- * Date: 01 July 2025
- * Course: SWEN 656 - Advanced Software Design and Implementation
- * 
- * Copyright (c) 2025 James Stevens
- * This file is part of the TicTacToe project and may not be used, copied,
- * modified, or distributed without permission.
- */
-
 /**
  * Aspect: InputAspect
  *

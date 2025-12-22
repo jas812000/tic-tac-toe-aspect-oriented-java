@@ -3,16 +3,6 @@ package tictactoe;
 import java.util.Random;
 import java.util.Scanner;
 
-/*
- * Author: James Stevens
- * Date: 01 July 2025
- * Course: SWEN 656 - Advanced Software Design and Implementation
- * 
- * Copyright (c) 2025 James Stevens
- * This file is part of the TicTacToe project and may not be used, copied,
- * modified, or distributed without permission.
- */
-
 /**
  * The core game controller for TicTacToe.
  * 
