@@ -65,7 +65,11 @@ public class TicTacToe {
         while (true) {
             System.out.print("Enter name for Player 1 (letters only): ");
             name1 = scanner.nextLine().trim();
-            if (name1.matches("[a-zA-Z]+")) break;
+                        if (name1.equalsIgnoreCase("exit")) {
+                System.out.println("\nExiting TicTacToe. Goodbye!");
+                return;
+            }
+if (name1.matches("[a-zA-Z]+")) break;
             System.out.println("Invalid name. Please use letters only (no numbers or symbols).");
         }
 
@@ -73,7 +77,11 @@ public class TicTacToe {
         while (true) {
             System.out.print("Enter name for Player 2 (letters only): ");
             name2 = scanner.nextLine().trim();
-            if (name2.matches("[a-zA-Z]+")) break;
+                        if (name2.equalsIgnoreCase("exit")) {
+                System.out.println("\nExiting TicTacToe. Goodbye!");
+                return;
+            }
+if (name2.matches("[a-zA-Z]+")) break;
             System.out.println("Invalid name. Please use letters only (no numbers or symbols).");
         }
 
