@@ -51,28 +51,37 @@ public class TicTacToe {
         System.out.println("---------------------------------\n");
 
         // --- Player Setup ---
-        String name1 = "";
-        while (true) {
-            System.out.print("Enter name for Player 1 (letters only): ");
-            name1 = scanner.nextLine().trim();
-                        if (name1.equalsIgnoreCase("exit")) {
-                System.out.println("\nExiting TicTacToe. Goodbye!");
-                return;
-            }
-if (name1.matches("[a-zA-Z]+")) break;
-            System.out.println("Invalid name. Please use letters only (no numbers or symbols).");
-        }
+        String name1;
+        String name2;
 
-        String name2 = "";
-        while (true) {
-            System.out.print("Enter name for Player 2 (letters only): ");
-            name2 = scanner.nextLine().trim();
-                        if (name2.equalsIgnoreCase("exit")) {
-                System.out.println("\nExiting TicTacToe. Goodbye!");
-                return;
+        if (PlayerSession.consumeReuseFlag() && PlayerSession.hasPlayers()) {
+            name1 = PlayerSession.player1();
+            name2 = PlayerSession.player2();
+            System.out.println("Using same players: " + name1 + " vs " + name2);
+        } else {
+            while (true) {
+                System.out.print("Enter name for Player 1 (letters only) or type 'exit': ");
+                name1 = scanner.nextLine().trim();
+                if (name1.equalsIgnoreCase("exit")) {
+                    System.out.println("\nExiting TicTacToe. Goodbye!");
+                    System.exit(0);
+                }
+                if (name1.matches("[a-zA-Z]+")) break;
+                System.out.println("Invalid name. Please use letters only (no numbers or symbols).");
             }
-if (name2.matches("[a-zA-Z]+")) break;
-            System.out.println("Invalid name. Please use letters only (no numbers or symbols).");
+
+            while (true) {
+                System.out.print("Enter name for Player 2 (letters only) or type 'exit': ");
+                name2 = scanner.nextLine().trim();
+                if (name2.equalsIgnoreCase("exit")) {
+                    System.out.println("\nExiting TicTacToe. Goodbye!");
+                    System.exit(0);
+                }
+                if (name2.matches("[a-zA-Z]+")) break;
+                System.out.println("Invalid name. Please use letters only (no numbers or symbols).");
+            }
+
+            PlayerSession.remember(name1, name2);
         }
 
         // Create Player objects using valid names
