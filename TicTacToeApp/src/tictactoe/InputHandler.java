@@ -43,7 +43,8 @@ public class InputHandler {
      */
     public static int[] getPlayerMove(Board board) {
         // This method will be intercepted by the InputAspect at runtime
-        throw new IllegalStateException("InputHandler.getPlayerMove must be intercepted by InputAspect");} 
+        throw new IllegalStateException("InputHandler.getPlayerMove must be intercepted by InputAspect");
+    }
 }
 
 
