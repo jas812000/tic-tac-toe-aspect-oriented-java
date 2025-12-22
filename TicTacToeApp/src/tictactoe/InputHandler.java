@@ -43,8 +43,7 @@ public class InputHandler {
      */
     public static int[] getPlayerMove(Board board) {
         // This method will be intercepted by the InputAspect at runtime
-        return new int[] { -1, -1 }; // Default placeholder; never actually used
-    } 
+        throw new IllegalStateException("InputHandler.getPlayerMove must be intercepted by InputAspect");} 
 }
 
 
