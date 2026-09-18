@@ -3,20 +3,27 @@ package tictactoe;
 import java.util.Scanner;
 
 /**
- * Provides validation for player move input in the TicTacToe game.
+ * Validates player move input for the TicTacToe game.
+ * <p>
+ * This class prompts the current player for a row and column, validates
+ * numeric input and board boundaries, ensures the selected cell is available,
+ * and supports exiting the application from either input prompt.
  *
- * - Prompts for row then column (1–3)
- * - Validates numeric input and board boundaries
- * - Ensures the selected cell is not already occupied
- * - Supports typing 'exit' (case-insensitive) to quit at any prompt
+ * @author James Stevens
+ * @version 1.0
+ * @since 2025-07-01
  */
 public class InputValidator {
 
     /**
-     * Prompts the current player for input until a valid move is entered.
+     * Prompts the current player until a valid move is entered.
+     * <p>
+     * Row and column values are entered using the user-facing range
+     * {@code 1-3} and converted to zero-based indexes before being returned.
+     * Entering {@code exit} at either prompt terminates the application.
      *
      * @param board the current game board
-     * @return an integer array containing the valid row and column (0-based)
+     * @return an array containing the zero-based row and column indexes
      */
     public static int[] getValidMove(Board board) {
         Scanner scanner = InputHandler.scanner;
@@ -25,45 +32,68 @@ public class InputValidator {
             System.out.println("\n" + TicTacToe.currentPlayer.getName()
                     + " (Player '" + TicTacToe.currentPlayer.getSymbol() + "')");
 
-            // Read row
             System.out.print("Row (1-3) or type 'exit': ");
             String rowInput = scanner.nextLine().trim();
+
             if (rowInput.equalsIgnoreCase("exit")) {
-                System.out.println("\nExiting TicTacToe. Goodbye!");
-                System.exit(0);
+                exitGame();
             }
 
-            // Read column
+            Integer row = parsePosition(rowInput);
+
+            if (row == null) {
+                continue;
+            }
+
             System.out.print("Column (1-3) or type 'exit': ");
             String colInput = scanner.nextLine().trim();
+
             if (colInput.equalsIgnoreCase("exit")) {
-                System.out.println("\nExiting TicTacToe. Goodbye!");
-                System.exit(0);
+                exitGame();
             }
 
-            int row;
-            int col;
-            try {
-                row = Integer.parseInt(rowInput) - 1;
-                col = Integer.parseInt(colInput) - 1;
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid input. Please enter numeric values only.");
+            Integer col = parsePosition(colInput);
+
+            if (col == null) {
                 continue;
             }
 
-            // Bounds check
-            if (row < 0 || row > 2 || col < 0 || col > 2) {
-                System.out.println("Invalid entry. Row and column must be between 1 and 3.");
-                continue;
-            }
-
-            // Occupancy check
-            if (board.getGrid()[row][col] != ' ') {
+            if (board.getCell(row, col) != ' ') {
                 System.out.println("Invalid move. Cell already taken. Try again.");
                 continue;
             }
 
-            return new int[] { row, col };
+            return new int[]{row, col};
         }
+    }
+
+    /**
+     * Converts a user-entered board position to a zero-based index.
+     *
+     * @param input the user-entered position
+     * @return the zero-based index, or {@code null} if the input is invalid
+     */
+    private static Integer parsePosition(String input) {
+        try {
+            int position = Integer.parseInt(input);
+
+            if (position < 1 || position > 3) {
+                System.out.println("Invalid entry. Please enter a number between 1 and 3.");
+                return null;
+            }
+
+            return position - 1;
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input. Please enter a numeric value between 1 and 3.");
+            return null;
+        }
+    }
+
+    /**
+     * Displays the exit message and terminates the application.
+     */
+    private static void exitGame() {
+        System.out.println("\nExiting TicTacToe. Goodbye!");
+        System.exit(0);
     }
 }

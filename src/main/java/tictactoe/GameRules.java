@@ -3,41 +3,85 @@ package tictactoe;
 import java.util.Optional;
 
 /**
- * Pure, testable TicTacToe rule evaluation (no I/O, no static game state).
- * Used for unit tests and can be called by Referee.
+ * Provides pure rule evaluation for the TicTacToe game.
+ * <p>
+ * This class contains no input/output operations or application state,
+ * allowing game rules to be evaluated independently and tested directly.
+ * It is used by {@link Referee} to determine whether a game has been won
+ * or ended in a draw.
+ *
+ * @author James Stevens
+ * @version 1.0
+ * @since 2025-07-01
  */
 public final class GameRules {
 
-    private GameRules() {}
+    /**
+     * Prevents instantiation of this utility class.
+     */
+    private GameRules() {
+    }
 
     /**
-     * @return Optional winner symbol ('X' or 'O') if a winner exists, otherwise empty.
+     * Determines whether the board contains a winning row, column, or diagonal.
+     *
+     * @param grid the current board state
+     * @return an {@link Optional} containing the winning symbol if a winner
+     *         exists; otherwise an empty {@code Optional}
      */
-    public static Optional<Character> winner(char[][] g) {
-        // rows + cols
+    public static Optional<Character> winner(char[][] grid) {
         for (int i = 0; i < 3; i++) {
-            if (g[i][0] != ' ' && g[i][0] == g[i][1] && g[i][1] == g[i][2]) return Optional.of(g[i][0]);
-            if (g[0][i] != ' ' && g[0][i] == g[1][i] && g[1][i] == g[2][i]) return Optional.of(g[0][i]);
+            if (grid[i][0] != ' '
+                    && grid[i][0] == grid[i][1]
+                    && grid[i][1] == grid[i][2]) {
+                return Optional.of(grid[i][0]);
+            }
+
+            if (grid[0][i] != ' '
+                    && grid[0][i] == grid[1][i]
+                    && grid[1][i] == grid[2][i]) {
+                return Optional.of(grid[0][i]);
+            }
         }
 
-        // diagonals
-        if (g[0][0] != ' ' && g[0][0] == g[1][1] && g[1][1] == g[2][2]) return Optional.of(g[0][0]);
-        if (g[0][2] != ' ' && g[0][2] == g[1][1] && g[1][1] == g[2][0]) return Optional.of(g[0][2]);
+        if (grid[0][0] != ' '
+                && grid[0][0] == grid[1][1]
+                && grid[1][1] == grid[2][2]) {
+            return Optional.of(grid[0][0]);
+        }
+
+        if (grid[0][2] != ' '
+                && grid[0][2] == grid[1][1]
+                && grid[1][1] == grid[2][0]) {
+            return Optional.of(grid[0][2]);
+        }
 
         return Optional.empty();
     }
 
     /**
-     * Draw = board full AND no winner.
+     * Determines whether the game has ended in a draw.
+     * <p>
+     * A draw occurs when every board position is occupied and no winning
+     * combination exists.
+     *
+     * @param grid the current board state
+     * @return {@code true} if the board is full and has no winner;
+     *         otherwise {@code false}
      */
-    public static boolean isDraw(char[][] g) {
-        if (winner(g).isPresent()) return false;
+    public static boolean isDraw(char[][] grid) {
+        if (winner(grid).isPresent()) {
+            return false;
+        }
 
-        for (char[] row : g) {
-            for (char c : row) {
-                if (c == ' ') return false;
+        for (char[] row : grid) {
+            for (char cell : row) {
+                if (cell == ' ') {
+                    return false;
+                }
             }
         }
+
         return true;
     }
 }

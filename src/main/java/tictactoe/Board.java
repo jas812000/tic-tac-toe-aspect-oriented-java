@@ -6,68 +6,96 @@ package tictactoe;
  */
 
 /**
- * Manages the 3x3 game board for TicTacToe.
- *
- * This class is responsible for:
- * - Initializing the board with empty cells
- * - Displaying the board to the console
- * - Placing player moves
- * - Providing access to the board state for evaluation
+ * Represents and manages the 3x3 TicTacToe game board.
+ * <p>
+ * This class initializes the board, displays its current state, places valid
+ * moves, and provides read-only access to board data for validation and
+ * rule evaluation.
+ * <p>
+ * The internal grid is encapsulated so callers cannot modify the board
+ * without using {@link #setMove(int, int, char)}.
  *
  * @author James Stevens
  * @version 1.0
  * @since 2025-07-01
  */
 public class Board {
-	private char[][] grid = new char[3][3];  // 3x3 grid representing the game board
+
+	private final char[][] grid = new char[3][3];
 
 	/**
-	 * Initializes a new game board by setting all cells to empty.
+	 * Creates an empty 3x3 game board.
 	 */
 	public Board() {
-		for (int i = 0; i < 3; i++) {
-			for (int j = 0; j < 3; j++) {
-				grid[i][j] = ' ';  // Empty cell
+		for (int row = 0; row < 3; row++) {
+			for (int col = 0; col < 3; col++) {
+				grid[row][col] = ' ';
 			}
 		}
 	}
 
 	/**
-	 * Displays the current state of the board in a formatted 3x3 grid.
+	 * Displays the current board state as a formatted 3x3 grid.
 	 */
 	public void display() {
 		System.out.println("-------------");
-		for (int i = 0; i < 3; i++) {
+
+		for (int row = 0; row < 3; row++) {
 			System.out.print("| ");
-			for (int j = 0; j < 3; j++) {
-				System.out.print(grid[i][j] + " | ");
+
+			for (int col = 0; col < 3; col++) {
+				System.out.print(grid[row][col] + " | ");
 			}
+
 			System.out.println("\n-------------");
 		}
 	}
 
 	/**
-	 * Attempts to place the specified symbol on the board at the given position.
+	 * Attempts to place a player's symbol at the specified board position.
 	 *
-	 * @param row the row index (0–2)
-	 * @param col the column index (0–2)
-	 * @param playerSymbol the player's symbol ('X' or 'O')
-	 * @return true if the move is valid and placed; false if the cell is already occupied
+	 * @param row          the zero-based row index
+	 * @param col          the zero-based column index
+	 * @param playerSymbol the player's symbol
+	 * @return {@code true} if the symbol was placed; {@code false} if the
+	 *         selected cell was already occupied
 	 */
 	public boolean setMove(int row, int col, char playerSymbol) {
 		if (grid[row][col] == ' ') {
 			grid[row][col] = playerSymbol;
 			return true;
 		}
+
 		return false;
 	}
 
 	/**
-	 * Returns the internal representation of the game board.
+	 * Returns a defensive copy of the current board state.
+	 * <p>
+	 * Changes made to the returned array do not affect the board's internal
+	 * grid.
 	 *
-	 * @return a 2D character array containing the current board state
+	 * @return a copy of the current 3x3 board
 	 */
 	public char[][] getGrid() {
-		return grid;
+		char[][] copy = new char[grid.length][];
+
+		for (int row = 0; row < grid.length; row++) {
+			copy[row] = grid[row].clone();
+		}
+
+		return copy;
+	}
+
+	/**
+	 * Returns the symbol stored at the specified board position.
+	 *
+	 * @param row the zero-based row index
+	 * @param col the zero-based column index
+	 * @return the symbol at the specified position, or a space if the cell
+	 *         is empty
+	 */
+	public char getCell(int row, int col) {
+		return grid[row][col];
 	}
 }

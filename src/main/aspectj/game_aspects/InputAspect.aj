@@ -4,15 +4,15 @@ import tictactoe.Board;
 import tictactoe.InputValidator;
 
 /**
- * Aspect: InputAspect
- *
- * Redirects player input calls to a centralized validation method.
- *
- * This aspect intercepts calls to {@code InputHandler.getPlayerMove(Board)} and
- * reroutes them to {@code InputValidator.getValidMove(Board)} to enforce input validation
- * uniformly across the application.
- *
- * This decouples input validation from the core logic, aligning with AOP principles.
+ * Redirects player move requests to centralized input validation.
+ * <p>
+ * This aspect intercepts calls to
+ * {@code InputHandler.getPlayerMove(Board)} and delegates input collection
+ * and validation to {@link InputValidator}.
+ * <p>
+ * Keeping this behavior in an aspect separates input-validation concerns
+ * from the main game controller and demonstrates Aspect-Oriented Programming
+ * through an explicit interception point.
  *
  * @author James Stevens
  * @version 1.0
@@ -21,17 +21,20 @@ import tictactoe.InputValidator;
 public aspect InputAspect {
 
     /**
-     * Pointcut: Matches any call to InputHandler.getPlayerMove(Board)
+     * Matches calls to {@code InputHandler.getPlayerMove(Board)} and binds
+     * the board argument used for move validation.
+     *
+     * @param board the current game board
      */
-    pointcut inputCall(Board board): 
-        call(int[] tictactoe.InputHandler.getPlayerMove(Board)) && args(board);
+    pointcut inputCall(Board board):
+            call(int[] tictactoe.InputHandler.getPlayerMove(Board))
+                    && args(board);
 
     /**
-     * Around advice: Redirects calls to {@code InputHandler.getPlayerMove(Board)}
-     * so that all input is handled by {@code InputValidator.getValidMove(Board)}.
+     * Replaces the intercepted input request with validated console input.
      *
      * @param board the current game board used for move validation
-     * @return a validated move as an integer array: [0] = row, [1] = column
+     * @return an array containing the zero-based row and column indexes
      */
     int[] around(Board board): inputCall(board) {
         return InputValidator.getValidMove(board);

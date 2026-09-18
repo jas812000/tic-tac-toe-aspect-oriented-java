@@ -4,16 +4,15 @@ import tictactoe.Board;
 import tictactoe.Referee;
 
 /**
- * Aspect: RefereeAspect
- *
- * Handles post-move game evaluation and board rendering.
- *
- * This aspect intercepts calls to {@code Board.setMove(...)} and, after each move:
- * - Displays the updated board state
- * - Checks for win or draw conditions via the {@code Referee} class
- *
- * By modularizing this logic, the core game controller remains focused on flow control,
- * while endgame responsibilities are delegated cleanly.
+ * Handles board rendering and game-end evaluation after successful moves.
+ * <p>
+ * This aspect observes calls to {@code Board.setMove(...)} and, when a move
+ * is successfully placed, displays the updated board and delegates win/draw
+ * evaluation to {@link Referee}.
+ * <p>
+ * {@code AspectOrder} ensures this aspect executes before {@code TurnAspect}
+ * so the player who made the move remains the current player while the
+ * referee evaluates the board and announces a winner.
  *
  * @author James Stevens
  * @version 1.0
@@ -21,27 +20,30 @@ import tictactoe.Referee;
  */
 public aspect RefereeAspect {
 
-    // Single instance of Referee to evaluate game state
-    private Referee referee = new Referee();
+    private final Referee referee = new Referee();
 
     /**
-     * Pointcut: Captures any call to Board.setMove(...) and
-     * binds the target Board instance to the 'board' parameter.
+     * Matches calls to {@code Board.setMove(int, int, char)} and binds the
+     * target board instance.
+     *
+     * @param board the board on which the move is attempted
      */
-    pointcut moveMade(Board board): 
-        call(boolean Board.setMove(int, int, char)) && target(board);
+    pointcut moveMade(Board board):
+            call(boolean Board.setMove(int, int, char)) && target(board);
 
     /**
-     * After advice: Executes after each call to {@code Board.setMove(...)}.
+     * Displays and evaluates the board after a successful move.
+     * <p>
+     * If the attempted move is rejected, no rendering or game-state
+     * evaluation occurs.
      *
-     * Responsibilities:
-     * - Displays the updated board to the console
-     * - Delegates win/draw evaluation to the {@code Referee}
-     *
-     * @param board the board instance that was modified
+     * @param board  the board on which the move was attempted
+     * @param result {@code true} if the move was successfully placed
      */
-    after(Board board): moveMade(board) {
-        board.display();                  // Show updated board
-        referee.checkGameOver(board);    // Evaluate win/draw conditions
+    after(Board board) returning(boolean result): moveMade(board) {
+        if (result) {
+            board.display();
+            referee.checkGameOver(board);
+        }
     }
 }

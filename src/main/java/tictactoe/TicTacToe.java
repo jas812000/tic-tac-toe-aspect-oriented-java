@@ -5,11 +5,11 @@ import java.util.Scanner;
 
 /**
  * The core game controller for TicTacToe.
- * 
+ * <p>
  * This class handles player setup, board creation, and the main game loop.
  * It prompts for player names (letters only), assigns player symbols,
  * randomly selects who goes first, and delegates move handling to InputHandler.
- * 
+ * <p>
  * Game logic such as validating moves, detecting win/draw conditions,
  * and switching turns is modularized via Aspect-Oriented Programming (AOP).
  * 
@@ -22,12 +22,12 @@ public class TicTacToe {
     public static Player currentPlayer;      // The player whose turn it is
     public static Player otherPlayer;        // The player waiting
 
-    private Board board = new Board();       // The game board instance
-    private Scanner scanner = new Scanner(System.in); // Scanner for player name input
+    private final Board board = new Board();       // The game board instance
+    private final Scanner scanner = InputHandler.scanner; // Scanner for player name input
 
     /**
      * Starts the game by initializing players, displaying rules, and launching the main game loop.
-     * 
+     * <p>
      * Responsibilities:
      * - Displays game introduction and rules
      * - Accepts player names (letters only)
@@ -109,8 +109,10 @@ public class TicTacToe {
         board.display();
 
         // --- Main Game Loop ---
-        // Repeats indefinitely. InputHandler.getPlayerMove is intercepted by an aspect,
-        // which delegates to InputValidator. After move is applied, RefereeAspect checks for win/draw.
+        // This loop intentionally has no local termination condition.
+        // InputAspect handles move input, while RefereeAspect evaluates each successful
+        // move. When the game ends, RestartGame either throws RestartRequested to unwind
+        // this loop or terminates the application if the player chooses to exit.
         while (true) {
             int[] move = InputHandler.getPlayerMove(board); // Intercepted by InputAspect
             int row = move[0];
