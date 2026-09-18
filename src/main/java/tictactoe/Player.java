@@ -7,13 +7,11 @@ package tictactoe;
 
 /**
  * Represents a player in the TicTacToe game.
- *
- * Each player has:
- * - A name, provided at the start of the game
- * - A symbol ('X' or 'O'), assigned randomly during setup
- *
- * This class provides accessors for both fields and a method to assign the symbol.
- * Used by the game controller to manage turn order and player-specific data.
+ * <p>
+ * Each player has a name provided during game setup and a symbol
+ * ({@code 'X'} or {@code 'O'}) assigned before play begins.
+ * The player's name remains unchanged for the lifetime of the object,
+ * while the symbol is assigned during game initialization.
  *
  * @author James Stevens
  * @version 1.0
@@ -21,13 +19,13 @@ package tictactoe;
  */
 public class Player {
 
-    private String name;           // Player's name
-    private char symbol = ' ';     // Player's symbol ('X' or 'O'), set after initialization
+    private final String name;
+    private char symbol = ' ';
 
     /**
      * Constructs a player with the specified name.
      *
-     * @param name the name of the player
+     * @param name the player's name
      */
     public Player(String name) {
         this.name = name;
@@ -36,25 +34,25 @@ public class Player {
     /**
      * Returns the player's name.
      *
-     * @return the name of the player
+     * @return the player's name
      */
     public String getName() {
         return name;
     }
 
     /**
-     * Returns the player's symbol.
+     * Returns the player's assigned symbol.
      *
-     * @return the symbol ('X' or 'O') assigned to the player
+     * @return the player's symbol, or a space if a symbol has not yet been assigned
      */
     public char getSymbol() {
         return symbol;
     }
 
     /**
-     * Assigns a symbol ('X' or 'O') to the player.
+     * Assigns the player's game symbol.
      *
-     * @param symbol the character representing the player on the board
+     * @param symbol the symbol to assign
      */
     public void setSymbol(char symbol) {
         this.symbol = symbol;

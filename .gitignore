@@ -24,6 +24,3 @@ out/
 .classpath
 .project
 .settings/
-
-# AspectJ / manual build output
-out/

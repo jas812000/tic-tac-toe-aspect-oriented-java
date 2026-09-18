@@ -6,16 +6,15 @@ package game_aspects;
  */
 
 /**
- * Aspect: AspectOrder
- *
- * Establishes execution precedence for aspects that share join points.
- *
- * This aspect ensures the following order of execution after each move:
- * - {@code RefereeAspect} runs first to evaluate game-ending conditions
- * - {@code TurnAspect} runs second to switch player turns
- *
- * This guarantees that win/draw checks are performed before the active player changes,
- * maintaining logical game flow and correct outcome announcements.
+ * Defines execution precedence for aspects that advise the same move operation.
+ * <p>
+ * {@code RefereeAspect} must evaluate the board before {@code TurnAspect}
+ * switches the active player. This ordering ensures that a winning move is
+ * evaluated while the player who made that move is still represented by
+ * {@code TicTacToe.currentPlayer}.
+ * <p>
+ * The declared precedence therefore preserves correct winner identification
+ * and turn-management behavior.
  *
  * @author James Stevens
  * @version 1.0
@@ -23,9 +22,9 @@ package game_aspects;
  */
 public aspect AspectOrder {
 
-	/**
-	 * Declares the execution order for aspects that target the same join point.
-	 * Ensures that {@code RefereeAspect} executes before {@code TurnAspect}.
-	 */
+    /**
+     * Ensures {@code RefereeAspect} executes before {@code TurnAspect} when
+     * both aspects advise the same join point.
+     */
     declare precedence: RefereeAspect, TurnAspect;
 }

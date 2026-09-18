@@ -1,180 +1,264 @@
 # Tic-Tac-Toe AOP System
 
-## Overview
-The Tic-Tac-Toe AOP System is a modular Java command-line backend application that implements a complete two-player Tic-Tac-Toe game with robust input handling, deterministic game rules, and clean separation of concerns.
+A Java 21 command-line Tic-Tac-Toe application that demonstrates Aspect-Oriented Programming (AOP) with AspectJ.
 
-The project emphasizes backend engineering principles such as domain modeling, testable business logic, build tooling, and the use of Aspect-Oriented Programming (AOP) to modularize cross-cutting concerns. Rather than embedding validation and rule enforcement directly into the game loop, these responsibilities are cleanly separated using AspectJ.
-
-This project is designed as a backend-focused case study, not a UI exercise.
-
----
+The project separates game rules, input validation, turn management, and game-end evaluation into focused components. AspectJ is used to intercept player input and coordinate post-move behavior while keeping the main game loop small and readable.
 
 ## Features
-- Two-player Tic-Tac-Toe game with a 3×3 board
-- Deterministic win and draw detection
-- Centralized, testable rules engine
-- Aspect-Oriented Programming for input interception and rule enforcement
-- Graceful exit support at all user input points
-- Clean restart flow without nested game loops
+
+- Two-player Tic-Tac-Toe on a 3×3 board
+- Random assignment of the first player
+- `X` and `O` player symbols
+- Win detection for rows, columns, and diagonals
+- Draw detection
+- Numeric and boundary validation for moves
+- Occupied-cell validation without losing the current turn
+- `exit` support during player and move input
+- Restart support after completed games
 - Optional reuse of player names between games
-- Maven-based build with AspectJ weaving
-- Automated unit tests for core game rules
-- Runnable command-line application
+- AspectJ-based input interception, referee evaluation, and turn switching
+- Maven build and AspectJ compile-time weaving
+- JUnit 5 tests for board behavior and game rules
 
----
+## Architecture
 
-## Architecture Overview
-The system follows a layered, object-oriented architecture with AspectJ-based cross-cutting concerns.
+The application combines object-oriented design with Aspect-Oriented Programming to separate core game behavior from cross-cutting concerns.
 
-### Controller / Application Layer
-#### TicTacToe
-- Orchestrates game setup, player flow, and the main game loop
-- Handles player name input and restart behavior
-- Delegates move input and rule evaluation to specialized components
+### Application Flow
 
-### Domain Model  
+`Main` owns the application-level restart loop, while `TicTacToe` performs game setup and runs the move loop.
 
-#### Board
-- Represents the 3×3 game grid
-- Encapsulates board state and rendering logic
+A typical move follows this flow:
 
-#### Player
-Represents a player with a name and assigned symbol (`X` or `O`)
+```text
+TicTacToe
+    |
+    v
+InputHandler.getPlayerMove()
+    |
+    | intercepted by InputAspect
+    v
+InputValidator.getValidMove()
+    |
+    v
+Board.setMove()
+    |
+    +--> RefereeAspect --> Referee --> GameRules
+    |
+    +--> TurnAspect
+```
 
-### Game Rules Engine
-#### GameRules
-- Pure, stateless rules engine
-- Determines:
-- - Win conditions
-- - Draw conditions
-- Completely decoupled from I/O and UI logic
-- Fully unit-tested
-This separation allows game rules to be tested independently of user interaction or AOP behavior.
- 
-### Validation & Cross-Cutting Concerns (AOP)
-AspectJ is used to modularize cross-cutting concerns without polluting core game logic.
-#### InputAspect
-- Intercepts calls to InputHandler.getPlayerMove
-- Redirects input handling to centralized validation logic
-#### RefereeAspect
-- Triggers rule evaluation after each move
-- Delegates win/draw detection to GameRules
-This design enforces correctness consistently while keeping the core game loop simple and readable.
- 
-### Restart & Session Management
-#### RestartGame
-- Handles end-of-game prompts
-- Ensures clean restarts without recursive or nested loops
-#### PlayerSession
-- Stores last-used player names
-- Allows optional reuse of players on restart
-- Keeps session state explicit and controlled
+`AspectOrder` gives `RefereeAspect` precedence over `TurnAspect`. This ensures the board is evaluated before the active player changes, preserving the correct player context when a winner is announced.
 
----
+### Core Classes
 
-## Repository Structure  
-The project follows the standard Maven directory layout:
-```bash
+#### `Main`
+
+Application entry point. Starts games and catches `RestartRequested` when the user chooses to play again.
+
+#### `TicTacToe`
+
+Coordinates player setup, symbol assignment, initial board display, and the main game loop.
+
+#### `Board`
+
+Encapsulates the 3×3 board state, applies moves, renders the board, and provides read-only access to board data. Complete board state is exposed through a defensive copy.
+
+#### `Player`
+
+Represents a player with an immutable name and an assigned game symbol.
+
+#### `GameRules`
+
+Pure, stateless rule engine responsible for:
+
+- Row wins
+- Column wins
+- Diagonal wins
+- Draw detection
+
+The rule engine contains no console input/output or application state, allowing it to be tested independently.
+
+### Input Handling
+
+#### `InputHandler`
+
+Provides the symbolic interception point used by AspectJ and owns the shared console scanner.
+
+#### `InputValidator`
+
+Handles console move input and validates:
+
+- Numeric values
+- Positions from 1 through 3
+- Occupied cells
+- Exit requests
+
+#### `InputAspect`
+
+Intercepts calls to `InputHandler.getPlayerMove(Board)` and delegates input collection and validation to `InputValidator`.
+
+The placeholder method in `InputHandler` fails fast if AspectJ weaving is not active.
+
+### Game Evaluation and Turn Management
+
+#### `RefereeAspect`
+
+Runs after successful calls to `Board.setMove(...)`. It displays the updated board and delegates game-end evaluation to `Referee`.
+
+Rejected moves do not trigger board rendering or referee evaluation.
+
+#### `Referee`
+
+Uses `GameRules` to detect wins and draws and begins the post-game restart workflow when the game ends.
+
+#### `TurnAspect`
+
+Switches the active players only after a successful move.
+
+#### `AspectOrder`
+
+Declares `RefereeAspect` before `TurnAspect`, ensuring game-end evaluation occurs before the active player changes.
+
+### Restart and Session Management
+
+#### `RestartGame`
+
+Handles the post-game decision to restart or exit.
+
+#### `PlayerSession`
+
+Stores player names between games and supports one-time reuse of those names after a restart.
+
+#### `RestartRequested`
+
+A control-flow exception used to unwind the current game loop and return control to `Main` when another game is requested.
+
+## Repository Structure
+
+```text
 tic-tac-toe-aspect-oriented-java/
-├── pom.xml
-├── README.md
 ├── LICENSE
+├── README.md
+├── pom.xml
 └── src/
     ├── main/
-    │   ├── java/
-    │   │   └── tictactoe/
-    │   │       ├── Board.java
-    │   │       ├── GameRules.java
-    │   │       ├── InputHandler.java
-    │   │       ├── InputValidator.java
-    │   │       ├── Player.java
-    │   │       ├── PlayerSession.java
-    │   │       ├── Referee.java
-    │   │       ├── RestartGame.java
-    │   │       └── TicTacToe.java
-    │   └── aspectj/
-    │       └── game_aspects/
-    │           ├── AspectOrder.aj
-    │           ├── InputAspect.aj
-    │           ├── RefereeAspect.aj
-    │           └── TurnAspect.aj
+    │   ├── aspectj/
+    │   │   └── game_aspects/
+    │   │       ├── AspectOrder.aj
+    │   │       ├── InputAspect.aj
+    │   │       ├── RefereeAspect.aj
+    │   │       └── TurnAspect.aj
+    │   └── java/
+    │       └── tictactoe/
+    │           ├── Board.java
+    │           ├── GameRules.java
+    │           ├── InputHandler.java
+    │           ├── InputValidator.java
+    │           ├── Main.java
+    │           ├── Player.java
+    │           ├── PlayerSession.java
+    │           ├── Referee.java
+    │           ├── RestartGame.java
+    │           ├── RestartRequested.java
+    │           └── TicTacToe.java
     └── test/
         └── java/
             └── tictactoe/
+                ├── BoardTest.java
                 └── GameRulesTest.java
 ```
-#### Notes:
-- Production code lives under src/main/java
-- AspectJ aspects live under src/main/aspectj
-- Tests live under src/test/java and run with mvn test
 
----
+## Testing
 
-## Error Handling Strategy
-The system enforces correctness and resilience through:
+The project currently contains **13 JUnit 5 tests** covering the board and pure game-rules engine.
 
-- Defensive validation of all user input
-- Graceful handling of invalid moves
-- Explicit exit support during:
-- - player name entry
-- - row input
-- - column input
-- Fail-fast behavior if AspectJ weaving is not active
-- Clean termination paths without orphaned input loops
+Automated coverage includes:
 
-Invalid input never crashes the application and is always handled safely.
+- Empty-board initialization
+- Successful move placement
+- Rejection of occupied cells
+- Protection against unintended cell changes
+- Defensive copying of board state
+- Row wins
+- Column wins
+- Both diagonal wins
+- Draw detection
+- Incomplete-board handling
+- Full-board winner handling
 
----
+Run the automated test suite with:
 
-## Build & Run
-The project is a static site and does not require a backend or build step.
+```bash
+mvn clean test
+```
+
+The interactive CLI and AspectJ orchestration are verified separately through manual end-to-end testing, including input validation, turn behavior, win/draw handling, restart behavior, player reuse, and exit paths.
+
+## Build and Run
 
 ### Prerequisites
-- Java 17+  
-- Maven 3.8+
 
-### Build  
+- Java 21
+- Maven 3.8 or later
+
+Verify your environment:
+
 ```bash
-mvn clean package  
+java -version
+mvn -version
 ```
 
-### Run 
+### Build and Test
+
 ```bash
-mvn exec:java  
+mvn clean test
 ```
 
-The application runs entirely in the terminal and guides the user through:
-- Player setup
-- Turn-based move entry
-- Win/draw detection
-- Restart or exit flow 
+### Package
 
----
+```bash
+mvn clean package
+```
 
-## Tools & Technologies  
-- **Language**: Java 17  
-- **Build Tool**: Maven  
-- **Aspect-Oriented Programming**: AspectJ  
-- **Testing**: JUnit 5  
-- **Architecture Style**: Layered backend architecture  
-- **Execution Model**: Command-line application
+### Run
 
----
+```bash
+mvn exec:java
+```
 
-## Purpose  
-This project serves as a backend engineering case study demonstrating:
-- Separation of concerns using Aspect-Oriented Programming
-- Clean domain modeling and testable business logic
-- Deterministic rule evaluation independent of UI flow
-- Defensive input handling
-- Proper build tooling and dependency management
-- Incremental refactoring and architectural improvement
+The application runs entirely in the terminal and guides the players through setup, move entry, game completion, and restart or exit.
 
----
+## AspectJ Build Notes
+
+The Maven build performs AspectJ weaving for both production and test compilation.
+
+During a successful build, AspectJ reports the join points advised by the project's aspects. Depending on the Maven and AspectJ plugin versions, the build may also report nonfatal plugin or unmatched-advice warnings during test compilation.
+
+These warnings do not prevent a successful build or indicate that production weaving failed. Production weave information can be seen in the Maven build output.
+
+## Technologies
+
+- Java 21
+- Maven
+- AspectJ
+- JUnit 5
+
+## What This Project Demonstrates
+
+This project is intentionally a command-line application rather than a GUI project. Its focus is the underlying software design, particularly:
+
+- Aspect-Oriented Programming with AspectJ
+- Separation of concerns
+- Compile-time aspect weaving
+- Object-oriented domain modeling
+- Encapsulation and defensive copying
+- Pure, independently testable business rules
+- Input validation
+- Explicit application and restart control flow
+- Maven-based Java project structure
+- Automated unit testing
 
 ## License
-This project is licensed under the MIT License.
-See the [LICENSE](LICENSE) file for details.
 
----
-
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.

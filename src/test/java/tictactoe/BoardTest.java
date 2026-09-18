@@ -2,57 +2,86 @@ package tictactoe;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+/**
+ * Unit tests for {@link Board}.
+ */
 class BoardTest {
 
     @Test
     void newBoard_hasAllEmptyCells() {
-        Board b = new Board();
-        char[][] g = b.getGrid();
+        Board board = new Board();
+        char[][] grid = board.getGrid();
 
-        assertEquals(3, g.length);
-        assertEquals(3, g[0].length);
+        assertEquals(3, grid.length);
+        assertEquals(3, grid[0].length);
 
-        for (int r = 0; r < 3; r++) {
-            for (int c = 0; c < 3; c++) {
-                assertEquals(' ', g[r][c], "Expected empty cell at [" + r + "][" + c + "]");
+        for (int row = 0; row < 3; row++) {
+            for (int col = 0; col < 3; col++) {
+                assertEquals(
+                        ' ',
+                        grid[row][col],
+                        "Expected empty cell at [" + row + "][" + col + "]"
+                );
             }
         }
     }
 
     @Test
     void setMove_placesSymbolOnEmptyCell_returnsTrue() {
-        Board b = new Board();
-        boolean applied = b.setMove(1, 1, 'X');
+        Board board = new Board();
+
+        boolean applied = board.setMove(1, 1, 'X');
 
         assertTrue(applied);
-        assertEquals('X', b.getGrid()[1][1]);
+        assertEquals('X', board.getCell(1, 1));
     }
 
     @Test
     void setMove_onOccupiedCell_returnsFalseAndDoesNotOverwrite() {
-        Board b = new Board();
+        Board board = new Board();
 
-        assertTrue(b.setMove(0, 0, 'X'));
-        assertFalse(b.setMove(0, 0, 'O'));
-        assertEquals('X', b.getGrid()[0][0], "Cell should not be overwritten");
+        assertTrue(board.setMove(0, 0, 'X'));
+        assertFalse(board.setMove(0, 0, 'O'));
+        assertEquals(
+                'X',
+                board.getCell(0, 0),
+                "Cell should not be overwritten"
+        );
     }
 
     @Test
     void setMove_doesNotModifyOtherCells() {
-        Board b = new Board();
-        b.setMove(2, 2, 'O');
+        Board board = new Board();
 
-        char[][] g = b.getGrid();
-        for (int r = 0; r < 3; r++) {
-            for (int c = 0; c < 3; c++) {
-                if (r == 2 && c == 2) {
-                    assertEquals('O', g[r][c]);
+        board.setMove(2, 2, 'O');
+
+        for (int row = 0; row < 3; row++) {
+            for (int col = 0; col < 3; col++) {
+                if (row == 2 && col == 2) {
+                    assertEquals('O', board.getCell(row, col));
                 } else {
-                    assertEquals(' ', g[r][c], "Unexpected modification at [" + r + "][" + c + "]");
+                    assertEquals(
+                            ' ',
+                            board.getCell(row, col),
+                            "Unexpected modification at [" + row + "][" + col + "]"
+                    );
                 }
             }
         }
+    }
+
+    @Test
+    void getGrid_returnsDefensiveCopy() {
+        Board board = new Board();
+        board.setMove(0, 0, 'X');
+
+        char[][] gridCopy = board.getGrid();
+        gridCopy[0][0] = 'O';
+
+        assertEquals('X', board.getCell(0, 0));
     }
 }

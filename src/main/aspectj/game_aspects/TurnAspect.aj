@@ -4,16 +4,15 @@ import tictactoe.Player;
 import tictactoe.TicTacToe;
 
 /**
- * Aspect: TurnAspect
- *
- * Manages turn switching between players after successful moves.
- *
- * This aspect intercepts calls to {@code Board.setMove(...)} and,
- * if the move is valid (returns {@code true}), it swaps
- * {@code currentPlayer} and {@code otherPlayer} in the {@code TicTacToe} class.
- *
- * This ensures that turns only alternate when a move has been successfully placed,
- * preserving game integrity.
+ * Manages player turn switching after successful moves.
+ * <p>
+ * This aspect observes calls to {@code Board.setMove(...)} and switches
+ * {@code TicTacToe.currentPlayer} and {@code TicTacToe.otherPlayer} only
+ * when the move is successfully placed.
+ * <p>
+ * {@code AspectOrder} ensures that game-end evaluation performed by
+ * {@code RefereeAspect} occurs before this aspect switches the active player.
+ * This preserves the correct player context when a winning move is evaluated.
  *
  * @author James Stevens
  * @version 1.0
@@ -22,16 +21,17 @@ import tictactoe.TicTacToe;
 public aspect TurnAspect {
 
     /**
-     * Pointcut: Matches any call to Board.setMove(...) that returns a boolean.
+     * Matches calls to {@code Board.setMove(int, int, char)}.
      */
-    pointcut moveMade(): call(boolean tictactoe.Board.setMove(int, int, char));
+    pointcut moveMade():
+            call(boolean tictactoe.Board.setMove(int, int, char));
 
     /**
-     * After advice: Executes following a successful call to {@code Board.setMove(...)}.
+     * Switches the active players after a successful move.
+     * <p>
+     * A rejected move leaves the current turn unchanged.
      *
-     * If the returned value is {@code true}, the players are swapped to alternate turns.
-     *
-     * @param result the return value from {@code setMove(...)} indicating if the move was accepted
+     * @param result {@code true} if the move was successfully placed
      */
     after() returning(boolean result): moveMade() {
         if (result) {
@@ -41,5 +41,3 @@ public aspect TurnAspect {
         }
     }
 }
-
-

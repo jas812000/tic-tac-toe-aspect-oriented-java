@@ -3,13 +3,14 @@ package tictactoe;
 import java.util.Scanner;
 
 /**
- * Handles input requests from the current player.
- *
- * This class serves as a symbolic entry point for AspectJ-based input validation.
- * The actual input logic is injected at runtime via {@code InputAspect}.
- *
- * This design promotes separation of concerns by keeping validation logic modular
- * and reusable across the system.
+ * Provides the AspectJ interception point for player move input.
+ * <p>
+ * The {@link #getPlayerMove(Board)} method intentionally contains no input
+ * implementation. Calls to it are intercepted by {@code InputAspect}, which
+ * delegates the actual prompting and validation to {@link InputValidator}.
+ * <p>
+ * The class also owns the shared console scanner used by the application's
+ * input-related classes.
  *
  * @author James Stevens
  * @version 1.0
@@ -17,24 +18,27 @@ import java.util.Scanner;
  */
 public class InputHandler {
 
-    // Shared scanner instance for reading input from the console
-    public static final Scanner scanner = new Scanner(System.in);
+    /**
+     * Shared scanner used for console input throughout the application.
+     */
+    static final Scanner scanner = new Scanner(System.in);
 
     /**
-     * Placeholder method intercepted by {@code InputAspect} to handle player input.
+     * Provides a symbolic interception point for AspectJ-managed player input.
+     * <p>
+     * {@code InputAspect} intercepts calls to this method and delegates input
+     * collection and validation to {@link InputValidator}. If AspectJ weaving
+     * is not active, this method throws an exception rather than silently
+     * bypassing the required input behavior.
      *
-     * The injected aspect is responsible for:
-     * - Prompting the player for input
-     * - Validating board boundaries (1–3)
-     * - Ensuring the selected cell is empty
-     *
-     * @param board the current game board (used during validation)
-     * @return an int array containing the selected row and column (0-based)
+     * @param board the current game board used during move validation
+     * @return an array containing the zero-based row and column indexes
+     * @throws IllegalStateException if the call is not intercepted by
+     *                               {@code InputAspect}
      */
     public static int[] getPlayerMove(Board board) {
-        // This method will be intercepted by the InputAspect at runtime
-        throw new IllegalStateException("InputHandler.getPlayerMove must be intercepted by InputAspect");
+        throw new IllegalStateException(
+                "InputHandler.getPlayerMove must be intercepted by InputAspect"
+        );
     }
 }
-
-

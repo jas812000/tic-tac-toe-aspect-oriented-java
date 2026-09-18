@@ -6,31 +6,34 @@ package tictactoe;
  */
 
 /**
- * Handles game-end logic by checking the board for win or draw conditions.
- *
- * This class is invoked automatically after each move via {@code RefereeAspect},
- * and is responsible for detecting:
- * - Draws: full board with no winner
- *
- * If a game-ending condition is met, it prints the result and prompts the user to restart.
- *
- * This logic is modularized and decoupled from the main game loop using Aspect-Oriented Programming (AOP).
+ * Handles game-end logic by checking the board for win and draw conditions.
+ * <p>
+ * This class is invoked automatically after each successful move via
+ * {@code RefereeAspect}. It is responsible for detecting and announcing
+ * a winner or identifying a draw.
+ * <p>
+ * When a game-ending condition is detected, the result is displayed and
+ * the user is prompted to restart or exit the game.
+ * <p>
+ * This logic is kept separate from the main game loop through
+ * Aspect-Oriented Programming (AOP).
  *
  * @author James Stevens
  * @version 1.0
  * @since 2025-07-01
  */
 public class Referee {
-	
-	private final RestartGame restartGame = new RestartGame(); // Handles restart prompt and logic
 
-	/**
-	 * Evaluates the current board to determine if a win or draw has occurred.
-	 * 
-	 * Called automatically after each move via AOP (RefereeAspect).
-	 *
-	 * @param board the current game board
-	 */
+    private final RestartGame restartGame = new RestartGame(); // Handles restart prompt and logic
+
+    /**
+     * Evaluates the current board to determine whether a win or draw has occurred.
+     * <p>
+     * Called automatically after each successful move through
+     * {@code RefereeAspect}.
+     *
+     * @param board the current game board
+     */
     public void checkGameOver(Board board) {
         char[][] g = board.getGrid();
 
@@ -47,9 +50,9 @@ public class Referee {
     }
 
     /**
-     * Announces the winner based on the symbol and restarts or ends the game.
+     * Announces the winning player and prompts the user to restart or exit.
      *
-     * @param playerSymbol the symbol ('X' or 'O') of the winning player
+     * @param playerSymbol the symbol ({@code 'X'} or {@code 'O'}) of the winning player
      */
     private void announceWinner(char playerSymbol) {
         String winnerName = (TicTacToe.currentPlayer.getSymbol() == playerSymbol)
@@ -57,7 +60,6 @@ public class Referee {
                 : TicTacToe.otherPlayer.getName();
 
         System.out.println("\n" + winnerName + " (Player '" + playerSymbol + "') wins!");
-        restartGame.promptRestart();  	// Offer to restart the game
+        restartGame.promptRestart();
     }
 }
-
